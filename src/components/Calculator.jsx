@@ -100,6 +100,45 @@ class Calculator extends React.Component {
             },
 
             ".": () => {
+                var cal = (displayValue.includes("+") || displayValue.includes("-") || displayValue.includes("×") || displayValue.includes("÷"));
+
+                //사칙연산 기호 나오기 전
+                if (displayValue.includes(".") && !(cal)) {//사칙연산은 없고 디스플레이 벨류에 이미 .이 있다면
+
+                }
+                else if (lastChar !== "" && !operatorKeys.includes(lastChar) && !(cal)) {
+                    this.setState({ displayValue: displayValue + "." });
+                }
+
+                //사칙연산 기호 나온 후
+                //+ 더하기
+                if (lastChar == "." || (displayValue.substring(displayValue.lastIndexOf("+"), displayValue.length).includes("."))) {//3.3+3?
+
+                }
+                else if (lastChar !== "" && !operatorKeys.includes(lastChar) && cal) {
+                    this.setState({ displayValue: displayValue + "." });
+                }
+                //- 빼기
+                if (lastChar == "." || (displayValue.substring(displayValue.lastIndexOf("-"), displayValue.length).includes("."))) {//3.3+3?
+
+                }
+                else if (lastChar !== "" && !operatorKeys.includes(lastChar) && cal) {
+                    this.setState({ displayValue: displayValue + "." });
+                }
+                //* 곱셈
+                if (lastChar == "." || (displayValue.substring(displayValue.lastIndexOf("×"), displayValue.length).includes("."))) {//3.3+3?
+
+                }
+                else if (lastChar !== "" && !operatorKeys.includes(lastChar) && cal) {
+                    this.setState({ displayValue: displayValue + "." });
+                }
+                // / 나눗셈
+                if (lastChar == "." || (displayValue.substring(displayValue.lastIndexOf("÷"), displayValue.length).includes("."))) {//3.3+3?
+
+                }
+                else if (lastChar !== "" && !operatorKeys.includes(lastChar) && cal) {
+                    this.setState({ displayValue: displayValue + "." });
+                }
             },
 
             "0": () => {
