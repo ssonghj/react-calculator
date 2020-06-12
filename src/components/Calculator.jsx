@@ -39,57 +39,84 @@ class Calculator extends React.Component {
     displayValue: ""
   };
 
-  onClickButton = key => {
-    let { displayValue = "" } = this.state;
-    displayValue = "" + displayValue;
-    const lastChar = displayValue.substr(displayValue.length - 1);
-    const operatorKeys = ["÷", "×", "-", "+"];
-    const proc = {
-      AC: () => {
-        this.setState({ displayValue: "" });
-      },
-      BS: () => {
-        if (displayValue.length > 0) {
-          displayValue = displayValue.substr(0, displayValue.length - 1);
-        }
-        this.setState({ displayValue });
-      },
-      // TODO: 제곱근 구현
-      "√": () => {},
-      // TODO: 사칙연산 구현
-      "÷": () => {},
-      "×": () => {},
-      "-": () => {},
-      "+": () => {
-        // + 연산 참고하여 연산 구현
-        if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
-          this.setState({ displayValue: displayValue + "+" });
-        }
-      },
-      "=": () => {
-        if (lastChar !== "" && operatorKeys.includes(lastChar)) {
-          displayValue = displayValue.substr(0, displayValue.length - 1);
-        } else if (lastChar !== "") {
-          displayValue = evalFunc(displayValue);
-        }
-        this.setState({ displayValue });
-      },
-      ".": () => {},
-      "0": () => {
-        if (Number(displayValue) !== 0) {
-          displayValue += "0";
-          this.setState({ displayValue });
-        }
-      }
-    };
+    onClickButton = key => {
 
-    if (proc[key]) {
-      proc[key]();
-    } else {
-      // 여긴 숫자
-      this.setState({ displayValue: displayValue + key });
-    }
-  };
+        let { displayValue = "" } = this.state;
+        displayValue = "" + displayValue;
+        const lastChar = displayValue.substr(displayValue.length - 1);
+        const operatorKeys = ["÷", "×", "-", "+"];
+        const proc = {
+            AC: () => {
+                this.setState({ displayValue: "" });
+            },
+            BS: () => {
+                if (displayValue.length > 0) {
+                    displayValue = displayValue.substr(0, displayValue.length - 1);
+                }
+                this.setState({ displayValue });
+            },
+            // TODO: 제곱근 구현
+            "√": () => {
+            },
+            // TODO: 사칙연산 구현
+            "÷": () => {
+                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//나눗셈
+                    this.setState({ displayValue: displayValue + "÷" });
+                }
+            },
+            "×": () => {
+                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//곱셈
+                    this.setState({ displayValue: displayValue + "×" });
+                }
+            },
+            "-": () => {
+                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//빼기
+                    this.setState({ displayValue: displayValue + "-" });
+                }
+            },
+            "+": () => {
+                // + 연산 참고하여 연산 구현
+                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {
+                    this.setState({ displayValue: displayValue + "+" });
+                }
+            },
+            "=": () => {
+                    if (lastChar !== "" && operatorKeys.includes(lastChar)) {
+                        displayValue = displayValue.substr(0, displayValue.length - 1);
+                    }
+                    else if (lastChar !== "" && displayValue.includes("×")) {//곱하기가 들어올 경우
+                        //replace로 대체해서 곱해주기
+                        displayValue = evalFunc(displayValue.replace(/×/gi, "*"));
+                    }
+                    else if (lastChar !== "" && displayValue.includes("÷")) {//나눗셈이 들어올 경우
+                        //replace로 대체해서 나눠주기
+                        displayValue = evalFunc(displayValue.replace(/÷/gi, "/"));
+                    }
+                    else if (lastChar !== "") {
+                        displayValue = evalFunc(displayValue);
+                    }
+
+              this.setState({ displayValue });
+            },
+
+            ".": () => {
+            },
+
+            "0": () => {
+                if (Number(displayValue) !== 0) {
+                    displayValue += "0";
+                    this.setState({ displayValue });
+                }
+            }
+        };
+
+        if (proc[key]) {
+            proc[key]();
+        } else {
+            // 여긴 숫자
+            this.setState({ displayValue: displayValue + key });
+        }
+    };
 
   render() {
     return (
