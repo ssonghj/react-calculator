@@ -33,9 +33,13 @@ const Box = styled.div`
 const evalFunc = function (string) {
     // eslint-disable-next-line no-new-func
     if (string.includes("√")) {
+        
         string.replace("(", "");
         string.replace(")", "");
         string = string.replace('√', '');
+        if (string == 0) {
+            return;
+        }
         return Math.sqrt(evalFunc(string));
     }
 
@@ -77,32 +81,37 @@ class Calculator extends React.Component {
             },
             // TODO: 제곱근 구현
             "√": () => {
-                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//루트 들어오면 디스플레이에 추가
-                    history[i] = "√(" + displayValue+")";//현재 displayValue 배열에 저장
-                    this.setState({ displayValue: "√(" + displayValue +")" });//맨앞에 배치
-                }
-
-                //사칙연산과 함께 들어올 경우
-                if (lastChar !== "" && (displayValue.includes("+") || displayValue.includes("-") || displayValue.includes("×") || displayValue.includes("÷"))) {
-                    //사칙연산 계산한 값에 루트를 씌워서 창에 띄운다
-                    if (displayValue.includes("×")) {
-                        displayValue = Math.sqrt(evalFunc(displayValue.replace(/×/gi, "*")));
-                    }
-                    else if (displayValue.includes("÷")) {
-                        displayValue = Math.sqrt(evalFunc(displayValue.replace(/÷/gi, "/")));
-                    }
-                    else {
-                        displayValue = Math.sqrt(evalFunc(displayValue.replace("√", "")));
-                    }
-                    this.setState({ displayValue });
+                if (displayValue.length == 0) {
+                    return;
                 }
                 else {
-                    displayValue = Math.sqrt(displayValue.substr(0, displayValue.length));//사칙연산 없으면 그냥 루트만 해준다.
+                    if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//루트 들어오면 디스플레이에 추가
+                        history[i] = "√(" + displayValue + ")";//현재 displayValue 배열에 저장
+                        this.setState({ displayValue: "√(" + displayValue + ")" });//맨앞에 배치
+                    }
+
+                    //사칙연산과 함께 들어올 경우
+                    if (lastChar !== "" && (displayValue.includes("+") || displayValue.includes("-") || displayValue.includes("×") || displayValue.includes("÷"))) {
+                        //사칙연산 계산한 값에 루트를 씌워서 창에 띄운다
+                        if (displayValue.includes("×")) {
+                            displayValue = Math.sqrt(evalFunc(displayValue.replace(/×/gi, "*")));
+                        }
+                        else if (displayValue.includes("÷")) {
+                            displayValue = Math.sqrt(evalFunc(displayValue.replace(/÷/gi, "/")));
+                        }
+                        else {
+                            displayValue = Math.sqrt(evalFunc(displayValue.replace("√", "")));
+                        }
+                        this.setState({ displayValue });
+                    }
+                    else {
+                        displayValue = Math.sqrt(displayValue.substr(0, displayValue.length));//사칙연산 없으면 그냥 루트만 해준다.
+                        this.setState({ displayValue });
+                    }
+
+                    i--;//전역변수 i 값 감소
                     this.setState({ displayValue });
                 }
-
-                i--;//전역변수 i 값 감소
-                this.setState({ displayValue });
             },
             // TODO: 사칙연산 구현
             "÷": () => {
@@ -280,16 +289,18 @@ class Calculator extends React.Component {
             </Button>
                     </ButtonGroup>
                 </Panel>
-                {/*History*/}
-                <History button={this.ClickButton}>
-                    {this.state.history.map((result) => {
-                        return (
-                            <Box display={result}>{(result)}<br/>{" = " + (evalFunc(result))}
-                            </Box>
-                        )
-                    })
-                    }
-                </History>
+                {/* TODO: History componet를 이용해 map 함수와 Box styled div를 이용해 history 표시 */
+                    <History button={this.ClickButton}>
+                        {this.state.history.map((result) => {
+                            return (
+                                <Box display={result}>
+                                    {(result)}<br />{" = " + evalFunc(result)}
+                                </Box>
+                            )
+                        })
+                        }
+                    </History>
+                }
             </Container>
         );
     }
