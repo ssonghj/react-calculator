@@ -28,23 +28,23 @@ const Box = styled.div`
   }
 `;
 
-const evalFunc = function(string) {
-  // eslint-disable-next-line no-new-func
-  return new Function("return (" + string + ")")();
+const evalFunc = function (string) {
+    // eslint-disable-next-line no-new-func
+    return new Function("return (" + string + ")")();
 };
 
 class Calculator extends React.Component {
-  // TODO: history 추가
-  state = {
-    displayValue: ""
-  };
+    // TODO: history 추가
+    state = {
+        displayValue: ""
+    };
 
     onClickButton = key => {
 
         let { displayValue = "" } = this.state;
         displayValue = "" + displayValue;
         const lastChar = displayValue.substr(displayValue.length - 1);
-        const operatorKeys = ["÷", "×", "-", "+"];
+        const operatorKeys = ["÷", "×", "-", "+", ".", "√"];
         const proc = {
             AC: () => {
                 this.setState({ displayValue: "" });
@@ -57,6 +57,30 @@ class Calculator extends React.Component {
             },
             // TODO: 제곱근 구현
             "√": () => {
+                if (lastChar !== "" && !operatorKeys.includes(lastChar)) {//루트 들어오면 디스플레이에 추가
+                    this.setState({ displayValue: "√" + displayValue });//맨앞에 배치
+                }
+
+                //사칙연산과 함께 들어올 경우
+                if (lastChar !== "" && (displayValue.includes("+") || displayValue.includes("-") || displayValue.includes("×") || displayValue.includes("÷"))) {
+                    //사칙연산 계산한 값에 루트를 씌워서 창에 띄운다
+                    if (displayValue.includes("×")) {
+                        displayValue = Math.sqrt(evalFunc(displayValue.replace(/×/gi, "*")));
+                    }
+                    else if (displayValue.includes("÷")) {
+                        displayValue = Math.sqrt(evalFunc(displayValue.replace(/÷/gi, "/")));
+                    }
+                    else {
+                        displayValue = Math.sqrt(evalFunc(displayValue.replace("√", "")));
+                    }
+                    this.setState({ displayValue });
+                }
+                else {
+                    displayValue = Math.sqrt(displayValue.substr(0, displayValue.length));//사칙연산 없으면 그냥 루트만 해준다.
+                    this.setState({ displayValue });
+                }
+
+                this.setState({ displayValue });//상태 출력
             },
             // TODO: 사칙연산 구현
             "÷": () => {
@@ -81,22 +105,22 @@ class Calculator extends React.Component {
                 }
             },
             "=": () => {
-                    if (lastChar !== "" && operatorKeys.includes(lastChar)) {
-                        displayValue = displayValue.substr(0, displayValue.length - 1);
-                    }
-                    else if (lastChar !== "" && displayValue.includes("×")) {//곱하기가 들어올 경우
-                        //replace로 대체해서 곱해주기
-                        displayValue = evalFunc(displayValue.replace(/×/gi, "*"));
-                    }
-                    else if (lastChar !== "" && displayValue.includes("÷")) {//나눗셈이 들어올 경우
-                        //replace로 대체해서 나눠주기
-                        displayValue = evalFunc(displayValue.replace(/÷/gi, "/"));
-                    }
-                    else if (lastChar !== "") {
-                        displayValue = evalFunc(displayValue);
-                    }
+                if (lastChar !== "" && operatorKeys.includes(lastChar)) {
+                    displayValue = displayValue.substr(0, displayValue.length - 1);
+                }
+                else if (lastChar !== "" && displayValue.includes("×")) {//곱하기가 들어올 경우
+                    //replace로 대체해서 곱해주기
+                    displayValue = evalFunc(displayValue.replace(/×/gi, "*"));
+                }
+                else if (lastChar !== "" && displayValue.includes("÷")) {//나눗셈이 들어올 경우
+                    //replace로 대체해서 나눠주기
+                    displayValue = evalFunc(displayValue.replace(/÷/gi, "/"));
+                }
+                else if (lastChar !== "") {
+                    displayValue = evalFunc(displayValue);
+                }
 
-              this.setState({ displayValue });
+                this.setState({ displayValue });
             },
 
             ".": () => {
@@ -157,55 +181,58 @@ class Calculator extends React.Component {
         }
     };
 
-  render() {
-    return (
-      <Container>
-        <Panel>
-          <Display displayValue={this.state.displayValue} />
-          <ButtonGroup onClickButton={this.onClickButton}>
-            <Button size={2} color="gray">
-              AC
+    render() {
+        return (
+            <Container>
+                <Panel>
+                    <Display displayValue={this.state.displayValue} />
+                    <ButtonGroup onClickButton={this.onClickButton}>
+                        <Button size={1} color="gray">
+                            AC
             </Button>
-            <Button size={1} color="gray">
-              BS
+                        <Button size={1} color="gray">
+                            BS
             </Button>
-            <Button size={1} color="gray">
-              ÷
+                        <Button size={1} color="gray">
+                            √
             </Button>
-
-            <Button size={1}>7</Button>
-            <Button size={1}>8</Button>
-            <Button size={1}>9</Button>
-            <Button size={1} color="gray">
-              ×
+                        <Button size={1} color="gray">
+                            ÷
             </Button>
 
-            <Button size={1}>4</Button>
-            <Button size={1}>5</Button>
-            <Button size={1}>6</Button>
-            <Button size={1} color="gray">
-              -
+                        <Button size={1}>7</Button>
+                        <Button size={1}>8</Button>
+                        <Button size={1}>9</Button>
+                        <Button size={1} color="gray">
+                            ×
             </Button>
 
-            <Button size={1}>1</Button>
-            <Button size={1}>2</Button>
-            <Button size={1}>3</Button>
-            <Button size={1} color="gray">
-              +
+                        <Button size={1}>4</Button>
+                        <Button size={1}>5</Button>
+                        <Button size={1}>6</Button>
+                        <Button size={1} color="gray">
+                            -
             </Button>
 
-            <Button size={2}>0</Button>
-            <Button size={1}>.</Button>
-            <Button size={1} color="gray">
-              =
+                        <Button size={1}>1</Button>
+                        <Button size={1}>2</Button>
+                        <Button size={1}>3</Button>
+                        <Button size={1} color="gray">
+                            +
             </Button>
-          </ButtonGroup>
-        </Panel>
-        {/* TODO: History componet를 이용해 map 함수와 Box styled div를 이용해 history 표시 */}
 
-      </Container>
-    );
-  }
+                        <Button size={2}>0</Button>
+                        <Button size={1}>.</Button>
+                        <Button size={1} color="gray">
+                            =
+            </Button>
+                    </ButtonGroup>
+                </Panel>
+                {/* TODO: History componet를 이용해 map 함수와 Box styled div를 이용해 history 표시 */}
+
+            </Container>
+        );
+    }
 }
 
 export default Calculator;
