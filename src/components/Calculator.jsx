@@ -36,11 +36,9 @@ const evalFunc = function (string) {
         
         string.replace("(", "");
         string.replace(")", "");
-        string = string.replace('√', '');
-        if (string == 0) {
-            return;
-        }
-        return Math.sqrt(evalFunc(string));
+        string = string.replace("√", "");
+
+        return new Function( "return (" + Math.sqrt(evalFunc(string))+")")();
     }
 
     string = string.replace(/÷/gi, "/");
@@ -100,13 +98,20 @@ class Calculator extends React.Component {
                             displayValue = Math.sqrt(evalFunc(displayValue.replace(/÷/gi, "/")));
                         }
                         else {
+                           
                             displayValue = Math.sqrt(evalFunc(displayValue.replace("√", "")));
                         }
                         this.setState({ displayValue });
                     }
                     else {
-                        displayValue = Math.sqrt(displayValue.substr(0, displayValue.length));//사칙연산 없으면 그냥 루트만 해준다.
-                        this.setState({ displayValue });
+                        if (displayValue.includes("√")) {
+                            displayValue = Math.sqrt(evalFunc(displayValue));
+                            this.setState({ displayValue })
+                        }
+                        else {
+                            displayValue = Math.sqrt(displayValue.substr(0, displayValue.length));//사칙연산 없으면 그냥 루트만 해준다.
+                            this.setState({ displayValue });
+                        }
                     }
 
                     i--;//전역변수 i 값 감소
@@ -136,6 +141,7 @@ class Calculator extends React.Component {
                 }
             },
             "=": () => {
+
                 history[i] = displayValue;//연산 전의 값 배열에 저장
 
                 if (displayValue.includes("√")) {//복원값에 루트 포함일 경우
@@ -294,7 +300,7 @@ class Calculator extends React.Component {
                         {this.state.history.map((result) => {
                             return (
                                 <Box display={result}>
-                                    {(result)}<br />{" = " + evalFunc(result)}
+                                    {(result)}<br />{" = " + (evalFunc(result)) }
                                 </Box>
                             )
                         })
